@@ -16,7 +16,7 @@ const Notes = () => {
       <NotesUpper setForm={setForm} layout={layout} setLayout={setLayout} />
       <NotesForm form={form} setForm={setForm} />
       {layout === "list" ? (
-        <NotesList notes={notes} />
+        <NotesList data={notes} />
       ) : (
         <NotesGrid data={notes} />
       )}

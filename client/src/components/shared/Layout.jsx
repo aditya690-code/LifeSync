@@ -3,7 +3,7 @@ import React from "react";
 
 const Layout = ({ handleLayout, setActiveLayout, activeLayout }) => {
   return (
-    <div className="right w-full h-full flex justify-evenly items-center mr-4 bg-[#f1f1f1]">
+    <div className="right w-full h-full flex justify-evenly items-center mr-4 bg-transparent">
       <LayoutList
         onClick={() => handleLayout("list", setActiveLayout)}
         size={30}

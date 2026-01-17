@@ -386,7 +386,7 @@ export default function Calendar() {
                 Journal
               </p>
             </div>
-            <div className="h-10/12 w-[16%]">
+            <div className="h-10/12 w-[16%] bg-[#f1f1f1]">
                 <Layout activeLayout={activeLayout} setActiveLayout={setActiveLayout} handleLayout={handleLayout} />  
             </div>
 

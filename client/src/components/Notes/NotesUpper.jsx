@@ -18,7 +18,7 @@ const NotesUpper = ({ setForm,layout,setLayout }) => {
         {/* Search */}
         <SearchBar searchText={searchText} setSearchText={setSearchText} />
         {/* Layout button */}
-        <div className="w-[16%] h-full border rounded overflow-hidden">
+        <div className="w-[16%] h-full border rounded overflow-hidden bg-[#f1f1f1] f1f1f1">
           <Layout
             activeLayout={layout}
             handleLayout={handleLayout}

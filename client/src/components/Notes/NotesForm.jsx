@@ -47,9 +47,8 @@ const NotesForm = ({ form, setForm, addNote }) => {
             transition-all duration-300 active:scale-95 
             flex items-center gap-3"
         >
-          Save
           <SaveIcon size={20} />
-          
+          Save
         </button>
       </div>
 
