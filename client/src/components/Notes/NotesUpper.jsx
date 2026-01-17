@@ -44,7 +44,7 @@ const NotesUpper = ({ setForm,layout,setLayout }) => {
             <X size={20} />
           )}
           {/* Text */}
-          Note
+          New Note
         </button>
       </div>
     </div>
