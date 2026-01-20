@@ -34,7 +34,7 @@ const AiForm = ({ setError, setMessages }) => {
     const handleKeyDown = (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        handleUserInput(userInput, setUserInput, handleAiForm);
+        handleUserInput(userInput, setUserInput, callAiForm);
       }
     };
 
@@ -56,6 +56,7 @@ const AiForm = ({ setError, setMessages }) => {
 
         <button
           onClick={() => handleUserInput(userInput, setUserInput, callAiForm)}
+
           disabled={!userInput.trim() || loading}
           className="bg-indigo-600 text-white p-3 rounded-md disabled:opacity-50"
         >
