@@ -1,5 +1,6 @@
 import callGemini from "../api/Gemini";
 
+
 export function handleLayout(lay, setActiveLayout) {
   localStorage.setItem("layout", lay);
   setActiveLayout(lay);
@@ -29,29 +30,32 @@ export async function handleAiForm(
   const date = new Date();
 
   const systemPrompt = `
-You are LifeSync Bot. You have READ and WRITE access to the user's data.
+    You are LifeSync Bot. You have READ and WRITE access to the user's data.
 
-Current Data Context: {contextStr}
+    Current Data Context: {contextStr}
 
-You must respond ONLY in valid JSON.
+    You must respond ONLY in valid JSON.
 
-If the user wants to perform an action, return:
-{ "type": "action", "tool": "TOOL_NAME", "args": { ... } }
+    If the user wants to perform an action, return:
+    { "type": "action", "tool": "TOOL_NAME", "args": { ... } }
 
-Available Tools:
-- add_expense: { amount, category, description }
-- add_note: { title, content }
-- add_diary: { title, content }
-- add_task: { title }
-- delete_item: { type, id }
-- complete_habit: { id, title }
+    Available Tools:
+    - add_expense: { amount, category, description }
+    - add_note: { title, content }
+    - add_diary: { title, content }
+    - add_task: { title }
+    - delete_item: { type, id }
+    - complete_habit: { id, title }
 
-If the user just wants to chat:
-{ "type": "message", "content": "text" }
+    If the user just wants to chat:
+    { "type": "message", "content": "text" }
 
-User Text: ${userInput}
-Today's Date: ${date}
-`;
+    User Text: ${userInput}
+    Today's Date: "${date.getDate()}/${date.getMonth()}/${date.getFullYear()}",
+    Today day:${date.getDay()},
+    Current time:"Hour:${date.getHours()}:Min${date.getMinutes()}"
+
+  `;
 
   setMessages((prev) => [...prev, { role: "user", text: userInput }]);
   setUserInput("");

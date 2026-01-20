@@ -77,7 +77,7 @@ function App() {
       </Routes>
       {access && (
         <>
-          {/* {access && <Ai />} */}
+          {access && <Ai />}
           {sidebar && <Sidebar handleSidebar={handleSidebar} />}
         </>
       )}

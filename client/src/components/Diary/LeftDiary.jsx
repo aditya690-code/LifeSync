@@ -35,6 +35,8 @@ const LeftDiary = () => {
     return str;
   }
 
+  console.log(setActiveDiary)
+
   // Toggle Search bar
   function toggleSearchBar() {
     if (isSearch === false) {

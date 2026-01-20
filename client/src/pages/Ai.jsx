@@ -2,15 +2,14 @@ import { useState } from "react";
 import { BotMessageSquare, Send, Maximize2, Minimize2, X } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import callGemini from "../api/Gemini";
-import { useEffect } from "react";
 import AiNav from "../components/Ai/AiNav";
-import { scrollToBottom } from "../services/function";
 import AiForm from "../components/Ai/AiForm";
+import AiDisplay from "../components/Ai/AiDisplay";
+import { useSelector } from "react-redux";
 
 const Ai = () => {
   const [panalActive, setPanalActive] = useState(false);
-  const [error,setError] = useState(false);
+  const [error, setError] = useState(false);
   const [maximizeBtn, setMaximizeBtn] = useState(false);
   useGSAP(
     () => {
@@ -22,8 +21,6 @@ const Ai = () => {
         ease: "power3.out",
       })
 
-
-
         .from(".input-p", {
           y: 400,
           duration: 0.6,
@@ -31,7 +28,7 @@ const Ai = () => {
           stagger: 0.15,
         });
     },
-    { dependencies: [panalActive] }
+    { dependencies: [panalActive] },
   );
 
   function setPanel() {
@@ -42,19 +39,8 @@ const Ai = () => {
     }
   }
 
-
-
-
-
-  useEffect(() => {
-    if (!panalActive) return;
-    const userP = document.createElement("p");
-    userP.classList.add("chat-bot");
-    userP.innerText = "  Welcome! How can I assist you today?";
-    document.querySelector(".display").appendChild(userP);
-    scrollToBottom();
-  }, [panalActive]);
-
+  const { isLoading } = useSelector((state) => state.chatbot);
+  
   return (
     <div className="botBox">
       {panalActive && (
@@ -72,9 +58,15 @@ const Ai = () => {
           {/* Inputs */}
           <div className="absolute top-0 left-0 h-full w-full z-20 flex flex-col">
             {/* Nav */}
-            <AiNav error={error} setPanel={setPanel} maximizeBtn={maximizeBtn} btns={true} setMaximizeBtn={setMaximizeBtn} />
+            <AiNav
+              error={error}
+              setPanel={setPanel}
+              maximizeBtn={maximizeBtn}
+              btns={true}
+              setMaximizeBtn={setMaximizeBtn}
+            />
             {/* Display */}
-            <div className="display sticky bottom-0 w-full flex flex-col gap-2 bg-transparent flex-1 py-2 px-4 overflow-y-scroll no-scrollbar"></div>
+            <AiDisplay loading={isLoading} />
             {/* Input section */}
             <div className="h-20 py-2">
               <AiForm setError={setError} />
