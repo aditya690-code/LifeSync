@@ -30,7 +30,9 @@ const AiNav = ({ maximizeBtn, setPanel, error, btns }) => {
       </span>
 
       <div className="h-full px-4 flex flex-col justify-center leading-5 items-start">
-        <h2 className="w-full font-medium text-white">Active Assistant</h2>
+        <h2 className="w-full font-medium text-white cursor-pointer">
+          <Tab route={'chatbot'} label={'Active Assistant'} />
+        </h2>
         <div className="text-xs text-gray-300 flex items-center justify-start w-fit pl-3">
           <p
             className={`${error == true ? "bg-red-500" : "bg-green-400 "} w-2 h-2 rounded-full animate-pulsepulse`}

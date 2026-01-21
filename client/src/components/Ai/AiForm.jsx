@@ -4,9 +4,13 @@ import callGemini from "../../api/Gemini";
 import { scrollToBottom } from "../../services/function";
 import { Send } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsLoading, setMessages } from "../../redux/features/ai/aiSlice";
+import {
+  setIsLoading,
+  setMessages,
+  setError,
+} from "../../redux/features/ai/aiSlice";
 
-const AiForm = ({ setError, loading }) => {
+const AiForm = ({ loading }) => {
   const [userInput, setUserInput] = useState("");
   const [rows, setRows] = useState(1);
   const dispatch = useDispatch();
@@ -32,8 +36,8 @@ const AiForm = ({ setError, loading }) => {
         );
         // handleUserInput(userInput, setUserInput, callAiForm);
         setUserInput("");
-        handleAiForm(userInput);
         scrollToBottom();
+        handleAiForm(userInput);
       }
     };
 
@@ -53,233 +57,185 @@ const AiForm = ({ setError, loading }) => {
     expenses,
   };
 
+// function extractJSON(text) {
+//   const match = text.match(/```json([\s\S]*?)```/);
+//   if (!match) return null;
+//   return JSON.parse(match[1].trim());
+// }
+
+
   async function handleAiForm() {
     if (!userInput.trim()) return;
+
     const date = new Date();
-
-    //   const systemPrompt = `
-    //   You are LifeSync Bot. You have READ and WRITE access to the user's data.
-
-    //   Current Data Context: {contextStr}
-
-    //   You must respond ONLY in valid JSON.
-
-    //   If the user wants to perform an action, return:
-    //   { "type": "action", "tool": "TOOL_NAME", "args": { ... } }
-
-    //   Available Tools:
-    //   - add_expense: { amount, category, description }
-    //   - add_note: { title, content }
-    //   - add_diary: { title, content }
-    //   - add_task: { title }
-    //   - delete_item: { type, id }
-    //   - complete_habit: { id, title }
-
-    //   If the user just wants to chat:
-    //   { "type": "message", "content": "text" }
-
-    //   User Text: ${userInput}
-    //   Today's Date: "${date.getDate()}/${date.getMonth()}/${date.getFullYear()}",
-    //   Today day:${date.getDay()},
-    //   Current time:"Hour:${date.getHours()}:Min${date.getMinutes()}"
-
-    // `;
-const systemPrompt = `
-You are **LifeSync Bot**, a personal productivity assistant.
-
-You have READ and WRITE access to the user's structured data.
-WRITE access is EXTREMELY RESTRICTED.
-
-----------------------------
-DATA CONTEXT
-----------------------------
-${contextData}
-
-----------------------------
-GLOBAL RESPONSE RULES (STRICT)
-----------------------------
-1. You MUST respond in valid JSON only.
-2. No explanations, no markdown, no extra text.
-3. NEVER hallucinate, infer, guess, improve, or auto-complete.
-4. DEFAULT response type is MESSAGE.
-5. If ANY doubt exists → MESSAGE.
-
-----------------------------
-CHAT MODE BOUNDARY (NON-NEGOTIABLE)
-----------------------------
-If user input is:
-- Greeting (hello, hi, hey, etc.)
-- Small talk
-- Question
-- Emotional expression
-- Exploration / discussion
-- Anything that does NOT clearly command a data change
-
-You are FORBIDDEN from returning ACTION.
-You MUST return MESSAGE.
-
-----------------------------
-ACTION GATE (HARD RULE)
-----------------------------
-You may return ACTION ONLY if ALL conditions are true:
-- User explicitly commands an operation
-- Intent is unambiguous
-- ALL required fields are explicitly present
-- Field values appear VERBATIM in user input
-
-If ANY condition fails → MESSAGE.
-
-----------------------------
-VERBATIM EXTRACTION RULE (CRITICAL)
-----------------------------
-When returning ACTION:
-- Copy values ONLY from user's exact words
-- Do NOT rephrase, summarize, enhance, or invent
-- Missing value = MISSING (do NOT fill it)
-
-If ANY required field is missing → MESSAGE.
-
-----------------------------
-FORBIDDEN AUTO-FILL BEHAVIOR
-----------------------------
-You MUST NEVER generate:
-- Generic titles (Task, Note, Reminder, Diary, Something)
-- Placeholder content
-- Assumed intent
-- Improved or cleaned text
-- Empty-but-non-null strings
-
-----------------------------
-TOOL-SPECIFIC VALIDATION
-----------------------------
-
-add_task:
-- Title MUST be explicitly written by the user
-- "add task" → MESSAGE
-- Implied task → MESSAGE
-
-add_note:
-- BOTH title AND content must be explicitly written
-- "add note" / "note this" → MESSAGE
-- Do NOT summarize or invent content
-
-add_diary:
-- User must clearly express diary/journal intent
-- Content must be user's own words only
-
-delete_item:
-- type AND id must be explicitly provided
-
-complete_habit:
-- id AND title must be explicitly provided
-
-----------------------------
-AVAILABLE TOOLS
-----------------------------
-- add_expense: { amount: number, category: string, description: string }
-- add_note: { title: string, content: string }
-- add_diary: { title: string, content: string }
-- add_task: { title: string }
-- delete_item: { type: string, id: string }
-- complete_habit: { id: string, title: string }
-
-----------------------------
-BINDING EXAMPLES
-----------------------------
-User: "hello"
-Response: MESSAGE
-
-User: "how are you?"
-Response: MESSAGE
-
-User: "add task"
-Response: MESSAGE
-
-User: "add note react"
-Response: MESSAGE
-
-User: "I spent 200 on food"
-Response: MESSAGE
-
-User: "add task buy groceries"
-Response: ACTION
-
-User: "add note title React Hooks content useEffect basics"
-Response: ACTION
-
-----------------------------
-RESPONSE FORMATS
-----------------------------
-
-ACTION:
-{
-  "type": "action",
-  "tool": "TOOL_NAME",
-  "args": { }
-}
-
-MESSAGE:
-{
-  "type": "message",
-  "content": "text"
-}
-
-----------------------------
-USER INPUT
-----------------------------
-"${userInput}"
-
-----------------------------
-TIME CONTEXT
-----------------------------
-${date.toLocaleString()}
-`;
     setRows(1);
     dispatch(setIsLoading());
 
+    const systemPrompt = `You are LifeSync Bot, a personal productivity assistant.
+
+      You have READ and WRITE access to the user's structured data.
+      WRITE access is EXTREMELY RESTRICTED.
+
+      ============================
+      ABSOLUTE OUTPUT CONSTRAINT
+      ============================
+      - Your entire response MUST be a SINGLE valid JSON object.
+      - Do NOT output explanations, reasoning, analysis, comments, or thoughts.
+      - Do NOT repeat instructions.
+      - Do NOT wrap output in markdown or code blocks.
+      - Do NOT include any text before or after JSON.
+      - Any violation is considered a critical failure.
+
+      ============================
+      DATA CONTEXT
+      ============================
+      ${contextData}
+
+      ============================
+      DEFAULT BEHAVIOR
+      ============================
+      - Default response type is "message".
+      - If there is ANY doubt, missing data, or ambiguity → respond with "message".
+      - NEVER infer, guess, auto-fill, improve, or hallucinate data.
+
+      ============================
+      CHAT MODE BOUNDARY (HARD)
+      ============================
+      If user input is:
+      - Greeting (hi, hello, hey, etc.)
+      - Question
+      - Small talk
+      - Emotional expression
+      - Discussion or exploration
+
+      You are STRICTLY FORBIDDEN from returning "action".
+      You MUST return "message".
+
+      ============================
+      ACTION GATE (NON-NEGOTIABLE)
+      ============================
+      Return "action" ONLY IF ALL conditions are met:
+      1. User explicitly commands an operation
+      2. Intent is clear and unambiguous
+      3. ALL required fields are provided verbatim
+      4. No assumptions are required
+
+      If ANY condition fails → return "message".
+
+      ============================
+      AVAILABLE TOOLS
+      ============================
+      - add_expense: { amount, category, description }
+      - add_note: { title, content }
+      - add_diary: { title, content }
+      - add_task: { title }
+      - delete_item: { type, id }
+      - complete_habit: { id, title }
+
+      ============================
+      RESPONSE SCHEMAS
+      ============================
+
+      MESSAGE:
+      {
+        "type": "message",
+        "content": "string"
+      }
+
+      ACTION:
+      {
+        "type": "action",
+        "tool": "TOOL_NAME",
+        "args": {}
+      }
+
+      ============================
+      EXAMPLES (STRICT)
+      ============================
+
+      User: "hi"
+      Response:
+      {
+        "type": "message",
+        "content": "Hey! How can I help you?"
+      }
+
+      User: "add task"
+      Response:
+      {
+        "type": "message",
+        "content": "Please provide the task title."
+      }
+
+      ============================
+      USER INPUT
+      ============================
+      "${userInput}"
+
+      ============================
+      TIME CONTEXT
+      ============================
+      ${date.toLocaleString()}
+      `
     try {
       const rawResponse = await callGemini(systemPrompt);
-      const raw = rawResponse.data.reply.trim();
+      // const raw = rawResponse?.data?.reply;
+      const raw = rawResponse.data
 
-      // 🛡 Safe JSON extraction
-      const start = raw.indexOf("{");
-      const end = raw.lastIndexOf("}");
-      const safeJson = raw.slice(start, end + 1);
-      const response = JSON.parse(safeJson);
+      console.log(rawResponse)
+
+      let response;
+
+      try {
+        response = raw
+      } catch {
+        response = {
+          type: "message",
+          content: raw,
+        };
+      }
+
+      console.log(response)
+
+      if (!response?.type || !["message", "action"].includes(response.type)) {
+        response = {
+          type: "message",
+          content: raw,
+        };
+      }
 
       if (response.type === "message") {
-        setMessages((prev) => [
-          ...prev,
-          { role: "bot", text: response.content },
-        ]);
+        dispatch(
+          setMessages({
+            role: "bot",
+            text: response.content,
+          }),
+        );
       }
 
       if (response.type === "action") {
         dispatch(
           setMessages({
             role: "bot",
-            text: `✅ Action detected: ${response.tool}`,
+            text: `Action detected: ${response.tool}`,
           }),
         );
 
-        // 👉 Here you can execute tool logic later
         console.log("ACTION:", response);
       }
     } catch (err) {
       console.error(err);
       dispatch(setError(err));
-      setMessages((prev) => [
-        ...prev,
-        {
+      dispatch(
+        setMessages({
           role: "bot",
           text: "⚠️ Something went wrong. Please try again.",
-        },
-      ]);
+        }),
+      );
     } finally {
       scrollToBottom();
     }
   }
-
   return (
     <div className="w-full h-full flex flex-col">
       {/* INPUT BOX */}
@@ -294,9 +250,11 @@ ${date.toLocaleString()}
 
         <button
           onClick={() => {
+            if(!userInput.trim()) return
             dispatch(setMessages({ role: "user", text: userInput }));
             setUserInput("");
             handleAiForm();
+            scrollToBottom();
           }}
           disabled={!userInput.trim() || loading}
           className="bg-indigo-600 text-white p-3 rounded-md disabled:opacity-50 cursor-pointer"
