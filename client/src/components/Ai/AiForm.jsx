@@ -9,6 +9,8 @@ import {
   setMessages,
   setError,
 } from "../../redux/features/ai/aiSlice";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 
 const AiForm = ({ loading }) => {
   const [userInput, setUserInput] = useState("");
@@ -236,7 +238,18 @@ const AiForm = ({ loading }) => {
       scrollToBottom();
     }
   }
+
+  useGSAP(()=>{
+    const tl = gsap.timeline();
+    tl.from('.ai-input',{
+      y:200,
+      autoAlpha:0,
+      stagger:0.17,
+      delay:0.4,
+    })
+  })
   return (
+
     <div className="w-full h-full flex flex-col">
       {/* INPUT BOX */}
       <div className="flex items-end gap-2 p-3 bord bg-transparent">
@@ -245,7 +258,7 @@ const AiForm = ({ loading }) => {
           rows={rows}
           onChange={(e) => handleRowsChange(e)}
           placeholder="Ask LifeSync…"
-          className="flex-1 resize-none rounded-md border px-3 py-2 outline-none text-black"
+          className="ai-input flex-1 resize-none rounded-md border px-3 py-2 outline-none text-black"
         />
 
         <button
@@ -257,7 +270,7 @@ const AiForm = ({ loading }) => {
             scrollToBottom();
           }}
           disabled={!userInput.trim() || loading}
-          className="bg-indigo-600 text-white p-3 rounded-md disabled:opacity-50 cursor-pointer"
+          className="ai-input bg-indigo-600 text-white p-3 rounded-md disabled:opacity-50 cursor-pointer"
         >
           <Send size={18} />
         </button>

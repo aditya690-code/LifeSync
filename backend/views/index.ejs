@@ -124,6 +124,7 @@
   <script>
     const chatBody = document.getElementById("chatBody");
     const msgInput = document.getElementById("msg");
+    let loading = false;
 
     async function send() {
       const text = msgInput.value.trim();
@@ -132,14 +133,20 @@
       addMessage(text, "user");
       msgInput.value = "";
 
+      loading = true;
       const res = await fetch("http://localhost:3000/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text }),
       });
-
       const data = await res.json();
-      addMessage(data.reply, "bot");
+      console.log(data)
+      loading = false;
+      addMessage(data.content, "bot");
+    }
+
+    if(loading){
+      addMessage('Thinking...','bot');
     }
 
     function addMessage(text, type) {

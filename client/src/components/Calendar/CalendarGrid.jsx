@@ -5,7 +5,7 @@ const CalendarGrid = ({ data }) => {
   }
 
   return (
-    <div className="grid grid-cols-3 w-full h-[86%] overflow-y-auto no-scrollbar p-3 py-0">
+    <div className="grid grid-cols-3 w-full h-full overflow-y-auto no-scrollbar p-3 py-0">
       {data.map((item, i) => {
         return (
           <div
