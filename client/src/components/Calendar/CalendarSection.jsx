@@ -1,15 +1,9 @@
-import React, { useState, useEffect } from "react";
-import {
-  days,
-  getDay,
-  goToToday,
-  isFind,
-  monthNames,
-  nextMonth,
-  prevMonth,
-} from "../../services/calendar";
+import React, { useState } from "react";
+import { days, monthNames } from "../../services/calendar";
 import {
   CheckSquare,
+  ChevronLeft,
+  ChevronRight,
   IndianRupee,
   LayoutGrid,
   LayoutList,
@@ -19,7 +13,12 @@ import { useSelector } from "react-redux";
 
 const CalendarSection = () => {
   const today = new Date();
-
+  const getDay = (idx) => {
+    return days[idx];
+  };
+  const [currentDate, setCurrentDate] = useState(
+    new Date(today.getFullYear(), today.getMonth(), 1),
+  );
   const [activeDate, setActiveDate] = useState({
     day: getDay(today.getDay()),
     date: today.getDate(),
@@ -27,11 +26,42 @@ const CalendarSection = () => {
     year: today.getFullYear(),
   });
 
+  const month = currentDate.getMonth();
+  const year = currentDate.getFullYear();
 
-  const month = activeDate.month;
-  const year = activeDate.year;
-  const totalDays = new Date(year, month, 0).getDate();
-  const firstDayIndex = new Date(year, month, 1).getDay();
+  const prevMonth = () => {
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1),
+    );
+  };
+
+  const goToToday = () => {
+    setCurrentDate(new Date(today.getFullYear(), today.getMonth(), 1));
+    setActiveDate({
+      day: getDay(today.getDay()),
+      date: today.getDate(),
+      month: monthNames[today.getMonth()],
+      year: today.getFullYear(),
+    });
+  };
+
+  const nextMonth = () => {
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1),
+    );
+  };
+
+  const firstDayIndex = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1,
+  ).getDay();
+
+  const totalDays = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() + 1,
+    0,
+  ).getDate();
 
   // Redux
   const diaries = useSelector((state) => state.diary.entry);
@@ -39,8 +69,15 @@ const CalendarSection = () => {
   const todo = useSelector((state) => state.todo.todo);
   const notes = useSelector((state) => state.notes.notes);
 
-  console.log("active date", activeDate);
-  console.log("total days", totalDays);
+  const isFind = (date, month, year, data) => {
+    return data.some((item) => {
+      return (
+        date === item.createdAt.date &&
+        month === item.createdAt.month &&
+        year === item.createdAt.year
+      );
+    });
+  };
 
   return (
     <div className="relative left w-2xl h-[calc(100vh-7rem)]">
@@ -48,7 +85,8 @@ const CalendarSection = () => {
         {/* Header */}
         <div className="flex h-12 justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">
-            {monthNames[month]} <span className="text-indigo-600">{year}</span>
+            {monthNames[month]}{" "}
+            <span className="text-indigo-600">{currentDate.getFullYear()}</span>
           </h2>
 
           <div className="flex items-center h-12 gap-4 bg-gray-100 px-4 py-2 rounded-md">
@@ -56,7 +94,7 @@ const CalendarSection = () => {
               onClick={prevMonth}
               className="hover:bg-white h-full font-light text-xl cursor-pointer w-8 flex items-center justify-center rounded-md "
             >
-              ‹
+              <ChevronLeft size={20} />
             </button>
             <button
               onClick={goToToday}
@@ -65,10 +103,10 @@ const CalendarSection = () => {
               TODAY
             </button>
             <button
-              onClick={() => nextMonth(month,year,setActiveDate)}
+              onClick={nextMonth}
               className="hover:bg-white h-full font-light text-xl cursor-pointer w-8 flex items-center justify-center rounded-md "
             >
-              ›
+              <ChevronRight size={20} />
             </button>
           </div>
         </div>
@@ -90,29 +128,31 @@ const CalendarSection = () => {
             const date = i + 1;
             const isToday =
               date === today.getDate() &&
-              month === today.getMonth()  &&
+              month === today.getMonth() &&
               year === today.getFullYear();
 
             return (
               <div
                 key={date}
                 className={`cursor-pointer h-20 w-15 rounded-2xl border flex flex-col items-center justify-center flex-wrap gap-2 text-lg font-semibold
-                    ${isToday ? "bg-indigo-100" : "border-gray-200"}
-                    ${
-                      activeDate.date === date &&
-                      activeDate.month === monthNames[activeDate.month] &&
-                      activeDate.year === activeDate.year
-                        ? "border-indigo-600"
-                        : "border-gray-200"
-                    }`}
-                onClick={() =>
+                        ${isToday ? "bg-indigo-100" : "border-gray-200"}
+                        ${
+                          activeDate.date === date &&
+                          activeDate.month === monthNames[month] &&
+                          activeDate.year === year
+                            ? "border-indigo-600"
+                            : "border-gray-200"
+                        }`}
+                onClick={() => {
+                  const clickedDate = new Date(year, month, date);
+
                   setActiveDate({
-                    day: days[getDay(date)],
+                    day: days[clickedDate.getDay()],
                     date: date,
                     month: monthNames[month],
                     year: year,
-                  })
-                }
+                  });
+                }}
               >
                 <p>{date} </p>
                 <div className="h-4 w-[80%] flex justify-evenly items-center">
