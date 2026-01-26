@@ -152,7 +152,7 @@ const CalendarSummery = () => {
       }`;
       const temp = setDataByDate(dt, expenses);
       setData(temp);
-    }
+
   }
 
   console.log(notes);

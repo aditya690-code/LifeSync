@@ -1,22 +1,42 @@
 import { CheckSquare, IndianRupee, Plus, X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../shared/Layout";
 import CalendarList from "./CalendarList";
 import CalendarGrid from "./CalendarGrid";
+import { monthNames } from "../../services/calendar";
+import { useSelector } from "react-redux";
 
 const CalendarSummery = ({ activeDate }) => {
   const spend = [];
-  const progress = 45;
+  const [progress, setProgress] = useState(45);
   const [activeText, setActiveText] = useState(
     localStorage.getItem("text") || "expenses",
   );
-  const data = [];
+  const [data, setData] = useState([]);
   const [activeLayout, setActiveLayout] = useState("list");
   const [isForm, setIsForm] = useState(false);
   const [formTitle, setFormTitle] = useState("");
   const [formAmount, setFormAmount] = useState("");
   const [formDesc, setFormDesc] = useState("");
   const [error, setError] = useState(false);
+
+  // Data
+  const todo = useSelector((state) => state.todo.todo);
+  const expenses = useSelector((state) => state.expenses.expenses);
+  const notes = useSelector((state) => state.notes.notes);
+  const diaries = useSelector((state) => state.diary.entry);
+
+  useEffect(() => {
+    if (activeText == "tasks") {
+      setData(todo);
+    } else if (activeText === "expenses") {
+      setData(expenses);
+    } else if (activeText === "notes") {
+      setData(notes);
+    } else if (activeText === "diary") {
+      setData(diaries);
+    }
+  }, [activeText, data]);
 
   const handleLayout = (layout, setLayout) => {
     localStorage.setItem("layout", layout);
@@ -25,8 +45,26 @@ const CalendarSummery = ({ activeDate }) => {
 
   const handleText = (text) => {
     setActiveText(text);
+    localStorage.setItem('text',text)
   };
 
+  const findAt = (mn) => monthNames.indexOf(mn) + 1;
+
+  const setDataByDate = () => {};
+
+  const findCompleted = (db) => {
+    return db.filter((item) => item.isDone == true);
+  };
+
+  const handleProgress = (dt) => {
+    const prdb = setDataByDate(dt, todo) || [];
+    const compl = findCompleted(prdb) || 0;
+    const newProgress =
+      prdb.length === 0 ? 0 : Math.round((compl.length / prdb.length) * 100);
+    setProgress(newProgress);
+  };
+
+  // Manage form
   const handleCalendarForm = () => {
     console.log("Title", formTitle);
     console.log("content", formDesc);
@@ -78,8 +116,8 @@ const CalendarSummery = ({ activeDate }) => {
 
       {/* Bottom */}
       <div className="bottom h-[60%] flex-1 flex flex-col justify-start  bg-gray-200 rounded-2xl items-center px-0 p-5 pb-0">
-        {/* Bottom Top */}
-        <div className="top w-full h-[12.5%] flex gap-2 justify-between  items-center mb-2 px-5">
+        {/* Bottom Top */} 
+        <div className="top w-full h-[15%] flex gap-2 justify-between  items-center mb-2 px-5">
           <div className="left flex w-[80%] h-full p-1 gap-2 px-5">
             <p
               onClick={() => handleText("expenses")}
@@ -130,7 +168,7 @@ const CalendarSummery = ({ activeDate }) => {
         </div>
 
         {/* Bottom Bottom */}
-        <div className="h-[90%] max-h-[90%] w-full flex flex-col">
+        <div className="h-[85%] max-h-[85%] w-full flex flex-col">
           {isForm && (
             <div className="calendar-form w-full h-fit px-4 py-2 flex justify-center items-center flex-col gap-2">
               <div className="w-full h-fit flex">
