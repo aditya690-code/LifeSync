@@ -1,5 +1,15 @@
 import NoteListitem from "./NoteListitem";
-import { EditIcon, Save, StickyNoteIcon, Trash2 } from "lucide-react";
+import {
+  EditIcon,
+  Loader2,
+  Save,
+  Sparkles,
+  StickyNoteIcon,
+  Trash2,
+} from "lucide-react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { useEffect, useRef, useState } from "react";
 
 const NotesList = ({
   data,
@@ -8,26 +18,57 @@ const NotesList = ({
   anyNote,
   setAnyNote,
 }) => {
+  const notelistRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
+  useGSAP(() => {
+    const tl = gsap.timeline();
+    tl.from(".list-box", { x: -400, duration: 0.5, autoAlpha: 0 }, "+=2.2");
+    tl.from(".note-box", { x: 500, duration: 0.5, autoAlpha: 0 }, ">");
+    tl.from(".list-box h2", { y: 30, duration: 0.4, autoAlpha: 0 });
+    if (notelistRef.current) {
+      tl.fromTo(
+        ".note-item",
+        {
+          y: 50,
+          scale: 1.2,
+          autoAlpha: 0,
+        },
+        { y: 0, scale: 1, duration: 0.2, stagger: 0.14, autoAlpha: 1 },
+      );
+    }
+  });
+
+  useEffect(() => {
+    const tl = gsap.timeline();
+    tl.fromTo(
+      ".note-input",
+      {
+        y: 300,
+        autoAlpha: 0,
+        opacity: 0,
+      },
+      { y: 0, autoAlpha: 1, opacity: 1, stagger: 0.14, duration: 0.4 },
+    );
+  }, [anyNote]);
+
   return (
     <div
-      className="h-[calc(100vh-8rem)] w-full 
+      className="h-[calc(100vh-8rem)] w-full
                     overflow-hidden py-1
                     flex justify-between gap-7 items-center px-8"
     >
       {/* Left Side of note [Notes List] */}
-      <div className="left h-full w-1/5 flex flex-col justify-between rounded-2xl overflow-hidden shadow-lg ">
+      <div className="left list-box h-full w-1/5 flex flex-col justify-between rounded-2xl overflow-hidden shadow-lg ">
         {/* Left Side Nav */}
-        <div className="">
-          <h2
-            onClick={() => {
-              setActiveNote({});
-              setAnyNote(false);
-            }}
-            className="bg-white px-6 py-3.5 font-semibold text-2xl cursor-pointer border-b border-gray-800"
-          >
-            Notes
-          </h2>
-        </div>
+        <h2
+          onClick={() => {
+            setActiveNote({});
+            setAnyNote(false);
+          }}
+          className="bg-white px-6 py-3.5 font-bold text-2xl cursor-pointer border-b border-gray-800"
+        >
+          Notes
+        </h2>
         {/* List of Notes */}
         <div className="flex-1 px-2 pb-2 bg-white overflow-y-auto no-scrollbar">
           {data.map((item) => (
@@ -36,24 +77,39 @@ const NotesList = ({
               data={item}
               setAnyNote={setAnyNote}
               setActiveNote={setActiveNote}
+              ref={notelistRef}
             />
           ))}
         </div>
       </div>
 
       {/* Right Side Of Note [View & form]*/}
-      <div className="right bg-white h-full flex-1 rounded-2xl overflow-hidden flex flex-col shadow">
+      <div className="right note-box bg-white h-full flex-1 rounded-2xl overflow-hidden flex flex-col shadow">
         {anyNote ? (
           <>
-            <div className="w-full px-2 pl-6 py-3 flex gap-2 border-b border-gray-800">
+            <div className="w-full px-2 pl-6 py-3 flex gap-2 border-b border-gray-800 right-form items-center">
               <input
-                className="text-2xl placeholder:text-gray-400 flex-1 outline-none border-none"
+                className="text-2xl placeholder:text-gray-400 flex-1 outline-none border-none note-input font-semibold"
                 value={activeNote?.title}
                 onChange={(e) =>
                   setActiveNote({ ...activeNote, title: e.target.value })
                 }
                 placeholder="Title"
               />
+              <button className="bg-[#ca5fe725] text-[#9565e7] px-2 h-fit py-2 rounded-full cursor-pointer">
+                {isLoading ? (
+                  <Loader2
+                    size={15}
+                    className="animate-spin"
+                    onClick={() => setIsLoading((prev) => !prev)}
+                  />
+                ) : (
+                  <Sparkles
+                    size={15}
+                    onClick={() => setIsLoading((prev) => !prev)}
+                  />
+                )}
+              </button>
               <button
                 className="
               bg-indigo-600 hover:bg-indigo-700 cursor-pointer active:scale-95 rounded-lg
@@ -75,7 +131,7 @@ const NotesList = ({
                 name=""
                 id=""
                 placeholder="Content"
-                className="bg-white placeholder:text-gray-400 w-full  outline-none border-none h-full resize-none overflow-y-auto px-4 pl-7 py-2"
+                className="bg-white placeholder:text-gray-400 w-full note-input  outline-none border-none h-full resize-none overflow-y-auto px-4 pl-7 py-2"
               ></textarea>
             </div>
           </>

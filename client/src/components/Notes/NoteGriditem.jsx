@@ -9,7 +9,7 @@ const NoteGriditem = ({ data, setIsNote, setViewNote }) => {
 
   return (
     <div
-      className="bg-white h-40 w-full rounded-2xl overflow-hidden shadow-lg cursor-pointer group"
+      className="bg-white h-40 w-full rounded-2xl overflow-hidden shadow-lg cursor-pointer group note-grid"
       onDoubleClick={() => handleNoteView(data)}
     >
       {/* Item Heading */}

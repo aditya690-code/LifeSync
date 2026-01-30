@@ -4,7 +4,9 @@ import {
   FileText,
   IndianRupee,
   Info,
+  Loader2,
   Notebook,
+  Sparkles,
   Trash2,
 } from "lucide-react";
 import React, { useState, useRef } from "react";
@@ -258,6 +260,7 @@ const HomeBottom = ({ tl, expenses, tasks, notes }) => {
     { scope: journalRef, dependencies: [activeJournal] },
   );
 
+  const [isLoading, setIsLoading] = useState(false);
   return (
     <>
       {/* Recent Transactions and Tasks Section  */}
@@ -289,12 +292,28 @@ const HomeBottom = ({ tl, expenses, tasks, notes }) => {
             <h2 className="text-center text-xl font-bold">
               Recent Transactions
             </h2>
-            <a
-              href="/expenses"
-              className="text-blue-600 hover:text-blue-900 font-medium text-sm"
-            >
-              VIEW ALL
-            </a>
+            <div className="flex gap-4 items-center">
+              <button className="bg-[#ca5fe725] text-[#9565e7] px-2 h-fit py-2 rounded-full cursor-pointer">
+                {isLoading ? (
+                  <Loader2
+                    size={15}
+                    className="animate-spin"
+                    onClick={() => setIsLoading((prev) => !prev)}
+                  />
+                ) : (
+                  <Sparkles
+                    size={15}
+                    onClick={() => setIsLoading((prev) => !prev)}
+                  />
+                )}
+              </button>
+              <a
+                href="/expenses"
+                className="text-blue-600 hover:text-blue-900 font-medium text-sm"
+              >
+                VIEW ALL
+              </a>
+            </div>
           </div>
           {/* Recent Transactions List */}
           <div className="list bg-white h-[calc(100%-4.28rem)] rounded-xl rounded-t-none overflow-y-auto no-scrollbar">
@@ -352,12 +371,29 @@ const HomeBottom = ({ tl, expenses, tasks, notes }) => {
           {/* Tasks Header Section  */}
           <div className="header flex justify-between items-center p-5 bg-[#e4e4e4] rounded-xl rounded-b-none">
             <h2 className="text-center text-xl font-bold">Tasks</h2>
-            <a
-              href="/routines"
-              className="text-blue-600 hover:text-blue-900 font-medium text-sm"
-            >
-              VIEW ALL
-            </a>
+            <div className="flex gap-4 items-center">
+              <button className="bg-[#ca5fe725] text-[#9565e7] px-2 h-fit py-2 rounded-full cursor-pointer">
+                {isLoading ? (
+                  <Loader2
+                    size={15}
+                    className="animate-spin"
+                    onClick={() => setIsLoading((prev) => !prev)}
+                  />
+                ) : (
+                  <Sparkles
+                    size={15}
+                    onClick={() => setIsLoading((prev) => !prev)}
+                  />
+                )}
+              </button>
+
+              <a
+                href="/routines"
+                className="text-blue-600 hover:text-blue-900 font-medium text-sm"
+              >
+                VIEW ALL
+              </a>
+            </div>
           </div>
           {/* Routine List */}
           <div className="list bg-white h-[calc(100%-4.28rem)] rounded-xl rounded-t-none overflow-y-auto no-scrollbar">
@@ -537,9 +573,27 @@ const HomeBottom = ({ tl, expenses, tasks, notes }) => {
           <div className="middle flex-1 h-full w-10/12 overflow-y-auto no-scrollbar p-5 bg-[#fafafa]">
             {activeJournal ? (
               <div ref={journalRef}>
-                <h2 className="text-xl font-bold p-2 w-full">
-                  {activeJournal.title}
-                </h2>
+                <div className="flex justify-between items-center w-full">
+                  <h2 className="text-xl font-bold p-2 w-full flex-1">
+                    {activeJournal.title}
+                  </h2>
+
+                  <button className="bg-[#ca5fe725] text-[#9565e7] px-2 h-fit py-2 rounded-full cursor-pointer">
+                    {isLoading ? (
+                      <Loader2
+                        size={15}
+                        className="animate-spin"
+                        onClick={() => setIsLoading((prev) => !prev)}
+                      />
+                    ) : (
+                      <Sparkles
+                        size={15}
+                        onClick={() => setIsLoading((prev) => !prev)}
+                      />
+                    )}
+                  </button>
+                </div>
+
                 <p className="pl-3">{activeJournal.content}</p>
               </div>
             ) : (

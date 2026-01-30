@@ -1,9 +1,12 @@
 import { SearchIcon, XCircle } from "lucide-react";
 import React from "react";
 
-const SearchBar = ({ searchText, setSearchText }) => {
+const SearchBar = ({ searchText, setSearchText, ref }) => {
   return (
-    <div className="flex relative flex-1 h-full rounded bg-gray-100 items-center border border-gray-800">
+    <div
+      className="flex relative flex-1 h-full rounded bg-gray-100 items-center border border-gray-800"
+      ref={ref}
+    >
       {/* Search Icon */}
       <SearchIcon size={30} className="p-1.5 rounded-l-md text-gray-950 ml-2" />
       {/* Search Input */}

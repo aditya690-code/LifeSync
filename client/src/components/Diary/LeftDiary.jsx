@@ -11,10 +11,10 @@ const LeftDiary = () => {
   const [diaries, setDiaries] = useState([]);
   const [searchValue, setSearchValue] = useState("");
 
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const { entry, hashMore } = useSelector(
     // , skip, isLoading, error, searchDiary, limit
-    (store) => store.diary
+    (store) => store.diary,
   );
   const ref = useRef();
   const listRef = useRef();
@@ -34,8 +34,6 @@ const LeftDiary = () => {
     }
     return str;
   }
-
-  console.log(setActiveDiary)
 
   // Toggle Search bar
   function toggleSearchBar() {
@@ -79,83 +77,21 @@ const LeftDiary = () => {
         ease: "power3.out",
       });
     },
-    { scope: ref, dependencies: [diaries] }
+    { scope: ref, dependencies: [diaries] },
   );
 
   return (
     <div className="left w-[18vw] rounded-2xl flex flex-col overflow-hidden bg-white shadow-lg shadow-white-500/50">
       {/* TOP BAR */}
-      <div className="header info flex justify-around items-center py-4 border-b rounded-t-2xl relative">
-        <div
-          className={
-            isSearch === false
-              ? "hidden absolute z-10 bg-white px-4 flex gap-0 pt-5 pb-0"
-              : "absolute z-10 bg-white px-4 flex gap-0 pt-5 pb-0"
-          }
-        >
-          <span
-            onClick={() => toggleSearchBar()}
-            className="head-item cross absolute right-2 top-0.5 text-black cursor-pointer"
-          >
-            <X size={15} />
-          </span>
-          <input
-            onChange={(e) => setSearchValue(e.target.value)}
-            value={searchValue}
-            type="text"
-            className="head-item outline-0 border border-r-0 rounded-sm rounded-r-none pl-2.5"
-            placeholder="Search "
-          />
-          <button
-            onClick={() => {
-              searchEntries(searchValue);
-            }}
-            className="head-item p-[0.8vh] rounded-sm rounded-l-none cursor-pointer border border-l-0"
-          >
-            <Search size={20} />
-          </button>
-        </div>
+      <div className="header info flex justify-start pl-6 items-center py-4 border-b rounded-t-2xl relative bg-[#e1e4e7]">
         <h3
-          className="head-item text-2xl font-semibold cursor-pointer"
+          className="head-item text-2xl font-bold cursor-pointer"
           onClick={() => {
             dispatch(setActiveDiary({}));
           }}
         >
           Entries
         </h3>
-        <div className="flex gap-2.5">
-          <button
-            onClick={() => toggleSearchBar()}
-            className="
-                                head-item
-                                p-[1.5vh] 
-                                bg-blue-100 
-                                text-indigo-600 
-                                rounded-lg 
-                                cursor-pointer 
-                                active:text-indigo-500 
-                                active:scale-[0.9]"
-          >
-            <Search size={20} />
-          </button>
-          <button
-            className="
-                                head-item
-                                p-[1.5vh] 
-                                bg-blue-100 
-                                text-indigo-600 
-                                rounded-lg 
-                                cursor-pointer 
-                                active:text-indigo-500 
-                                active:scale-[0.9]"
-            onClick={() => {
-              // setActiveDiary({ title: "", content: "" })
-              // setIsDiaryActive(true);
-            }}
-          >
-            <Plus size={20} />
-          </button>
-        </div>
       </div>
 
       {/* SCROLLABLE CONTENT */}

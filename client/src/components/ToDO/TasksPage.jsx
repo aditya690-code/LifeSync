@@ -2,7 +2,15 @@ import React, { useRef, useState } from "react";
 // import { useEffect } from "react";
 import Header from "./Header";
 import gsap from "gsap";
-import { LayoutGrid, List, ListTodo, Trash, Trash2 } from "lucide-react";
+import {
+  LayoutGrid,
+  List,
+  ListTodo,
+  Loader2,
+  Sparkles,
+  Trash,
+  Trash2,
+} from "lucide-react";
 import { useSelector } from "react-redux";
 import TaskList from "./TaskList";
 import TaskGrid from "./TaskGrid";
@@ -17,6 +25,7 @@ const TasksPage = () => {
   const tasks = useSelector((state) => state.todo.todo);
   const temp = tasks.filter((task) => task.isDone != true);
   const [data, setData] = useState(temp);
+  const [isLoading, setIsLoading] = useState(false);
 
   // useEffect(() => {
   //   if (!containerRef.current) return;
@@ -101,7 +110,7 @@ const TasksPage = () => {
             className="bg-100 flex gap-5 justify-between items-center py-1"
           >
             {taskStatus === "history" ? (
-              <button 
+              <button
                 className="
                   text-red-500 hover:text-red-600 p-1 
                   transition-all 
@@ -115,6 +124,20 @@ const TasksPage = () => {
             ) : (
               ""
             )}
+            <button className="bg-[#ca5fe725] text-[#9565e7] px-2 h-fit py-2 rounded-full cursor-pointer">
+              {isLoading ? (
+                <Loader2
+                  size={15}
+                  className="animate-spin"
+                  onClick={() => setIsLoading((prev) => !prev)}
+                />
+              ) : (
+                <Sparkles
+                  size={15}
+                  onClick={() => setIsLoading((prev) => !prev)}
+                />
+              )}
+            </button>
             <p className="p-2 bg-gray-300 rounded-full py-1 px-2 font-medium text-lg text-black">
               {data.length}
             </p>

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { SaveIcon, X } from "lucide-react";
+import { Loader2, SaveIcon, Sparkles, X } from "lucide-react";
 
 const NotesForm = ({ form, setForm, addNote }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAdd = () => {
     if (!title.trim() || !content.trim()) {
@@ -39,7 +40,18 @@ const NotesForm = ({ form, setForm, addNote }) => {
   return (
     <div className="w-[97%] mx-auto mt-6 rounded-xl bg-white shadow-sm shadow-gray-100 py-4 pt-0">
       {/* Actions */}
-      <div className="flex justify-end gap-2 pt-2 w-full px-8">
+      <div className="flex justify-end items-center gap-5 pt-2 w-full px-8">
+        <button className="bg-[#ca5fe725] text-[#9565e7] px-2.5 h-fit py-2.5 rounded-full cursor-pointer">
+          {isLoading ? (
+            <Loader2
+              size={15}
+              className="animate-spin"
+              onClick={() => setIsLoading((prev) => !prev)}
+            />
+          ) : (
+            <Sparkles size={15} onClick={() => setIsLoading((prev) => !prev)} />
+          )}
+        </button>
         <button
           onClick={handleAdd}
           className="px-6 py-2 rounded-lg cursor-pointer my-2

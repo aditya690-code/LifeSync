@@ -1,7 +1,7 @@
 import { Calendar, Trash2 } from "lucide-react";
 import { printSubString } from "../../services/function";
 
-const NoteListitem = ({ data, setAnyNote, setActiveNote }) => {
+const NoteListitem = ({ data, setAnyNote, setActiveNote, ref }) => {
   return (
     <div
       className="flex items-center m-2
@@ -12,7 +12,9 @@ const NoteListitem = ({ data, setAnyNote, setActiveNote }) => {
       hover:-translate-y-1 
       transition-all duration-300
       active:scale-95
+      note-item
     "
+      ref={ref}
     >
       <div
         className="flex-1 flex flex-col justify-center h-16"
@@ -21,7 +23,7 @@ const NoteListitem = ({ data, setAnyNote, setActiveNote }) => {
           setActiveNote(data);
         }}
       >
-        <h2 className="font-medium py-0.5">{printSubString(data.title, 20)}</h2>
+        <h3 className="font-medium py-0.5">{printSubString(data.title, 20)}</h3>
 
         <p className="text-xs pl-1 text-gray-500">
           {printSubString(data.content, 25)}

@@ -1,9 +1,12 @@
 import { LayoutGrid, LayoutList } from "lucide-react";
 import React from "react";
 
-const Layout = ({ handleLayout, setActiveLayout, activeLayout }) => {
+const Layout = ({ handleLayout, setActiveLayout, activeLayout, ref }) => {
   return (
-    <div className="right w-full h-full flex justify-evenly items-center mr-4 bg-transparent">
+    <div
+      className="right w-full h-full flex justify-evenly items-center mr-4 bg-transparent"
+      ref={ref}
+    >
       <LayoutList
         onClick={() => handleLayout("list", setActiveLayout)}
         size={30}
