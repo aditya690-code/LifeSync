@@ -1,49 +1,39 @@
 import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { Calendar, Calendar1, Trash2 } from "lucide-react";
-import React, { useRef } from "react";
+import { useRef } from "react";
 import ListItem from "../Common/ListItem";
+import gsap from "gsap";
 
 const TaskList = ({ data }) => {
-  const taskConRef = useRef(null);
+  const containerRef = useRef(null);
+
+  // Each TaskList manages its own timeline
+  const listTL = useRef(null);
+  if (!listTL.current) listTL.current = gsap.timeline();
 
   useGSAP(
     () => {
-      if (!taskConRef.current) return;
+      listTL.current.clear(); // clear previous animations
 
-      // Clear previous animations
-      const tl = gsap.timeline();
-      tl.clear();
-
-      // Scope GSAP to this component only
-      const ctx = gsap.context(() => {
-        tl.from(taskConRef.current, {
-          y: 120,
-          autoAlpha: 0,
-          scale: 0.95,
-          duration: 0.6,
-          ease: "power3.out",
-        }).from(".task-item", {
-          y: 60,
-          autoAlpha: 0,
-          duration: 0.4,
-          stagger: 0.12,
-          ease: "power3.out",
-        });
-      }, taskConRef);
-
-      return () => ctx.revert();
+      // Animate all children (ListItem) in this container
+      listTL.current.fromTo(
+        containerRef.current.children,
+        { y: 50, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.3, stagger: 0.1 },
+      );
     },
-    { dependencies: [data.length] },
+    {
+      dependencies: [data], // re-run animation whenever data changes
+      scope: containerRef, // safe scoping
+    },
   );
 
   return (
     <div
-      ref={taskConRef}
+      ref={containerRef}
       className="w-full max-h-full overflow-y-auto no-scrollbar"
     >
       {data.map((task, i) => (
-        <ListItem data={task} key={i} />
+        <ListItem data={task} key={task.id ?? i} />
       ))}
     </div>
   );

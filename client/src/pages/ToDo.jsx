@@ -13,15 +13,14 @@ const ToDo = () => {
       task.createdAt.month === today.getMonth() &&
       task.createdAt.year === today.getFullYear(),
   );
-  const completedTasks = todayTasks.filter((task) => task.isDone === true);
+  const completedTasks = todo.filter((task) => task.isDone === true);
 
-  const totalTasks = todayTasks.length;
+  const totalTasks = todo.length;
   const doneTasks = completedTasks.length;
 
   const progress =
     totalTasks === 0 ? 0 : Math.round((doneTasks / totalTasks) * 100);
 
-  const tl = gsap.timeline();
   const addTask = (title, content) => {
     if (title === "" || content === "") return;
     console.log("title", title);
@@ -43,7 +42,7 @@ const ToDo = () => {
         </div>
       </div>
       <Header addTask={addTask} />
-      <TasksPage tl={tl} />
+      <TasksPage />
     </div>
   );
 };

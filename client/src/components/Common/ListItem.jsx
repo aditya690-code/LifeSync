@@ -6,7 +6,7 @@ import { isTaskDue } from "../../services/function";
 const ListItem = ({ data }) => {
   return (
     // List item
-    <div className="task-item group w-full px-12 py-3 bg-gray-200 hover:bg-gray-50 cursor-pointer flex justify-between items-center">
+    <div className="task-list-item group w-full px-12 py-3 bg-gray-200 hover:bg-gray-50 cursor-pointer flex justify-between items-center">
       {/* Text section */}
       <div className="flex items-center gap-3 flex-1 py-3">
         {/* Checkbox */}

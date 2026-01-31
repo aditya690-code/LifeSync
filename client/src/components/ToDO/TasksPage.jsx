@@ -1,208 +1,194 @@
 import React, { useRef, useState } from "react";
-// import { useEffect } from "react";
-import Header from "./Header";
 import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import {
   LayoutGrid,
   List,
   ListTodo,
   Loader2,
   Sparkles,
-  Trash,
   Trash2,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import TaskList from "./TaskList";
 import TaskGrid from "./TaskGrid";
-// import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(useGSAP);
 
 const TasksPage = () => {
-  const layout = localStorage.getItem("layout") || "list";
-  const [view, setView] = useState(layout);
+  /* 🔹 State */
+  const [view, setView] = useState(
+    () => localStorage.getItem("layout") || "list"
+  );
   const [taskStatus, setTaskStatus] = useState("pending");
-  // const containerRef = useRef(null);
-  const headRightRef = useRef(null);
-  const tasks = useSelector((state) => state.todo.todo);
-  const temp = tasks.filter((task) => task.isDone != true);
-  const [data, setData] = useState(temp);
   const [isLoading, setIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //   if (!containerRef.current) return;
+  /* 🔹 Redux */
+  const tasks = useSelector((state) => state.todo.todo);
 
-  //   gsap.fromTo(
-  //     containerRef.current.children,
-  //     {
-  //       opacity: 0,
-  //       y: 20,
-  //       scale: 0.95,
-  //     },
-  //     {
-  //       opacity: 1,
-  //       y: 0,
-  //       scale: 1,
-  //       duration: 0.4,
-  //       stagger: 0.06,
-  //       ease: "power3.out",
-  //     }
-  //   );
-  // }, [view]);
-  const handleData = (str) => {
-    setTaskStatus(str);
-    if (str === "pending") {
-      const temp = tasks.filter((task) => task.isDone != true);
-      setData(temp);
-    } else {
-      const temp = tasks.filter((task) => task.isDone == true);
-      setData(temp);
-    }
-  };
+  /* 🔹 Derived data */
+  const data = tasks.filter((task) =>
+    taskStatus === "pending" ? !task.isDone : task.isDone
+  );
+
+  /* 🔹 Refs */
+  const containerRef = useRef(null);
+  const taskCon = useRef(null);
+  const taskConNav = useRef(null);
+  const headRightRef = useRef(null);
+
+  /* 🔹 Timeline (created once) */
+  const introTL = useRef(null);
+  if (!introTL.current) introTL.current = gsap.timeline();
+
+  /* 🔹 Intro animation */
+  useGSAP(
+    () => {
+      introTL.current.clear();
+
+      introTL.current
+        .fromTo(
+          taskCon.current,
+          { y: 400, autoAlpha: 0 },
+          { y: 0, autoAlpha: 1, duration: 0.5 }
+        )
+        .from(taskConNav.current, {
+          y: 300,
+          autoAlpha: 0,
+          duration: 0.4,
+        })
+        .from(".task-nav-h2", {
+          y: 200,
+          autoAlpha: 0,
+          duration: 0.4,
+        })
+        .from(headRightRef.current.children, {
+          y: 200,
+          autoAlpha: 0,
+          duration: 0.4,
+          stagger: 0.14,
+        });
+    },
+    { scope: containerRef, dependencies: [] }
+  );
+
+  /* 🔹 Handlers */
   const handleView = (layout) => {
     setView(layout);
     localStorage.setItem("layout", layout);
   };
 
-  const tl = useRef(gsap.timeline());
-  // useGSAP(() => {
-  //   tl.current.from(
-  //     ".taskBody",
-  //     {
-  //       y: 800,
-  //       duration: 0.6,
-  //       scale: 0.6,
-  //     },
-  //     '-=2'
-  //   )
-  //     .from(".taskHead", {
-  //       y: 200,
-  //       duration: 0.2,
-  //       autoAlpha: 0,
-  //     },'-=0.5')
-
-  //     .from(".taskHead h2", {
-  //       x: -600,
-  //       duration: 0.6,
-  //       autoAlpha: 0,
-  //     })
-
-  //     .from(
-  //       headRightRef.current.children,
-  //       {
-  //         x: 800,
-  //         scale: 0,
-  //         autoAlpha: 0,
-  //         stagger: 0.15,
-  //       },
-  //       "<"
-  //     );
-  // });
-
   return (
-    <div className="px-4 h-[86%] w-full taskBody">
-      <div className="h-full w-full rounded-2xl flex flex-col justify-between items-center">
+    <div
+      ref={containerRef}
+      className="px-4 h-[86%] w-full taskBody"
+    >
+      <div
+        ref={taskCon}
+        className="h-full w-full rounded-2xl flex flex-col"
+      >
         {/* Header */}
-        <div className="taskHead w-full h-20 bg-[#e4e4e4] rounded-t-2xl flex justify-between items-center px-6">
-          <h2 className="text-xl font-semibold">
+        <div
+          ref={taskConNav}
+          className="w-full h-20 bg-[#e4e4e4] rounded-t-2xl flex justify-between items-center px-6"
+        >
+          <h2 className="text-xl font-semibold task-nav-h2">
             {taskStatus === "pending" ? "To Do List" : "Completed History"}
           </h2>
+
           <div
             ref={headRightRef}
-            className="bg-100 flex gap-5 justify-between items-center py-1"
+            className="flex gap-5 items-center"
           >
-            {taskStatus === "history" ? (
+            {taskStatus === "history" && (
               <button
-                className="
-                  text-red-500 hover:text-red-600 p-1 
-                  transition-all 
-                  duration-300 active:scale-90 
-                  ease-in-out cursor-pointer 
-                  rounded-full
-                "
+                className="text-red-500 hover:text-red-600 active:scale-90 transition"
+                aria-label="Clear history"
               >
                 <Trash2 size={20} />
               </button>
-            ) : (
-              ""
             )}
-            <button className="bg-[#ca5fe725] text-[#9565e7] px-2 h-fit py-2 rounded-full cursor-pointer">
+
+            <button
+              onClick={() => setIsLoading((p) => !p)}
+              className="bg-[#ca5fe725] text-[#9565e7] px-2 py-2 rounded-full"
+            >
               {isLoading ? (
-                <Loader2
-                  size={15}
-                  className="animate-spin"
-                  onClick={() => setIsLoading((prev) => !prev)}
-                />
+                <Loader2 size={15} className="animate-spin" />
               ) : (
-                <Sparkles
-                  size={15}
-                  onClick={() => setIsLoading((prev) => !prev)}
-                />
+                <Sparkles size={15} />
               )}
             </button>
-            <p className="p-2 bg-gray-300 rounded-full py-1 px-2 font-medium text-lg text-black">
+
+            <p className="bg-gray-300 rounded-full px-3 py-1 font-medium">
               {data.length}
             </p>
 
-            {/*  */}
-            <div className="flex gap-2 bg-gray-300 py-1 px-2 rounded-md">
+            {/* Status */}
+            <div className="flex gap-2 bg-gray-300 p-1 rounded-md">
               <button
-                onClick={() => handleData("pending")}
-                className={`${
+                onClick={() => setTaskStatus("pending")}
+                className={`px-4 py-1 rounded-md ${
                   taskStatus === "pending"
-                    ? "bg-indigo-500  text-white"
+                    ? "bg-indigo-500 text-white"
                     : "text-gray-400"
-                } px-5 py-1 border-2 border-transparent rounded-md cursor-pointer`}
+                }`}
               >
-                {" "}
                 Pending
               </button>
               <button
-                onClick={() => handleData("history")}
-                className={`${
+                onClick={() => setTaskStatus("history")}
+                className={`px-4 py-1 rounded-md ${
                   taskStatus === "history"
-                    ? "bg-green-500  text-white"
+                    ? "bg-green-500 text-white"
                     : "text-gray-400"
-                } px-5 py-1 border-2 border-transparent rounded-md cursor-pointer`}
+                }`}
               >
                 History
               </button>
             </div>
 
             {/* View */}
-            <div className="bg-gray-300 rounded-md flex justify-between gap-2 p-2.5">
+            <div className="bg-gray-300 rounded-md flex gap-2 p-1">
               <List
-                size={30}
+                size={28}
+                role="button"
+                tabIndex={0}
+                aria-label="List view"
                 onClick={() => handleView("list")}
-                className={`${
+                className={`cursor-pointer p-1.5 rounded-md ${
                   view === "list" ? "bg-white" : "text-gray-400"
-                } p-1.5 rounded-md cursor-pointer`}
+                }`}
               />
               <LayoutGrid
-                size={30}
+                size={28}
+                role="button"
+                tabIndex={0}
+                aria-label="Grid view"
                 onClick={() => handleView("grid")}
-                className={`${
+                className={`cursor-pointer p-1.5 rounded-md ${
                   view === "grid" ? "bg-white" : "text-gray-400"
-                } p-1.5 rounded-md cursor-pointer`}
+                }`}
               />
             </div>
           </div>
         </div>
-        {/* Body / Empty State */}
+
+        {/* Body */}
         <div className="flex-1 w-full bg-white shadow-2xl rounded-b-2xl overflow-hidden">
           {tasks.length > 0 ? (
             view === "list" ? (
-              <TaskList data={data} tl={tl} />
+              <TaskList data={data} />
             ) : (
               <TaskGrid data={data} />
             )
           ) : (
-            taskStatus && (
-              <div className="h-full w-full flex justify-center items-center">
-                <h2 className="text-gray-300 flex justify-center items-center flex-wrap">
-                  <ListTodo size={40} className="w-full" />
-                  <p className="w-full text-center"> No tasks found.</p>
-                </h2>
+            <div className="h-full w-full flex justify-center items-center text-gray-300">
+              <div className="text-center">
+                <ListTodo size={40} className="mx-auto" />
+                <p>No tasks found.</p>
               </div>
-            )
+            </div>
           )}
         </div>
       </div>
