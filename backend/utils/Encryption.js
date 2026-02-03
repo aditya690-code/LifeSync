@@ -9,10 +9,10 @@ function encryptMessage(message) {
 
 console.log(key);
 
- function decryptMessage(ciphertext)   {
+function decryptMessage(ciphertext) {
   //,key
   const bytes = CryptoJS.AES.decrypt(ciphertext, key);
   return bytes.toString(CryptoJS.enc.Utf8);
-};
+}
 
-export default  encryptMessage;
+export { encryptMessage, decryptMessage };
