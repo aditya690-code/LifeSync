@@ -20,6 +20,10 @@ const taskScheme = mongoose.Schema({
     ref: "User",
     required: true,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 export default mongoose.model("Task", taskScheme);
